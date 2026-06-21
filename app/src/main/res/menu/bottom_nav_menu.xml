@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/navigation_katalog"
+        android:icon="@drawable/ic_katalog"
+        android:title="Katalog" />
+    <item
+        android:id="@+id/navigation_inventori"
+        android:icon="@drawable/ic_inventori"
+        android:title="Inventori" />
+    <item
+        android:id="@+id/navigation_penjualan"
+        android:icon="@drawable/ic_penjualan"
+        android:title="Penjualan" />
+    <item
+        android:id="@+id/navigation_profile"
+        android:icon="@drawable/ic_profile"
+        android:title="Profil" />
+</menu>

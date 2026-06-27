@@ -9,7 +9,7 @@ class DBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
 
     companion object {
         private const val DATABASE_NAME = "warungin.db"
-        private const val DATABASE_VERSION = 3
+        private const val DATABASE_VERSION = 4
 
         // Nama Tabel
         const val TABLE_USER = "user"
@@ -88,36 +88,12 @@ class DBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         // Insert Data Produk Dummy Realistis Indonesia
         val dummyProdukList = listOf(
             ContentValues().apply {
-                put(COL_PRODUK_NAMA, "Keripik Pisang Coklat")
-                put(COL_PRODUK_KATEGORI, "Bahan Makanan")
-                put(COL_PRODUK_HARGA, 15000.0)
-                put(COL_PRODUK_STOK, 12)
-                put(COL_PRODUK_DESKRIPSI, "Keripik pisang renyah khas Lampung dibalut bubuk coklat premium tebal.")
-                put(COL_PRODUK_FOTO, "https://images.unsplash.com/photo-1566843972142-a7fcb70de55a?w=400")
-            },
-            ContentValues().apply {
-                put(COL_PRODUK_NAMA, "Kopi Robusta Bubuk 200g")
-                put(COL_PRODUK_KATEGORI, "Bahan Minuman")
-                put(COL_PRODUK_HARGA, 28000.0)
-                put(COL_PRODUK_STOK, 20)
-                put(COL_PRODUK_DESKRIPSI, "Biji kopi Robusta Temanggung pilihan, di-roast level medium, digiling halus.")
-                put(COL_PRODUK_FOTO, "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=400")
-            },
-            ContentValues().apply {
-                put(COL_PRODUK_NAMA, "Sambal Roa Pedas")
-                put(COL_PRODUK_KATEGORI, "Bahan Makanan")
-                put(COL_PRODUK_HARGA, 35000.0)
-                put(COL_PRODUK_STOK, 4) // Stok menipis (<5) untuk pengujian UI oranye
-                put(COL_PRODUK_DESKRIPSI, "Sambal tradisional Manado yang gurih dengan campuran daging ikan roa asap asli.")
-                put(COL_PRODUK_FOTO, "https://images.unsplash.com/photo-1596797038530-2c107229654b?w=400")
-            },
-            ContentValues().apply {
                 put(COL_PRODUK_NAMA, "Gula Pasir Lokal 1kg")
                 put(COL_PRODUK_KATEGORI, "Bahan Makanan")
                 put(COL_PRODUK_HARGA, 17000.0)
                 put(COL_PRODUK_STOK, 15)
                 put(COL_PRODUK_DESKRIPSI, "Gula pasir putih manis berkualitas untuk kebutuhan sehari-hari kemasan 1kg.")
-                put(COL_PRODUK_FOTO, "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=400")
+                put(COL_PRODUK_FOTO, "gula")
             },
             ContentValues().apply {
                 put(COL_PRODUK_NAMA, "Madu Hutan Murni 250ml")
@@ -125,7 +101,7 @@ class DBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
                 put(COL_PRODUK_HARGA, 95000.0)
                 put(COL_PRODUK_STOK, 8)
                 put(COL_PRODUK_DESKRIPSI, "Madu murni alami dipanen langsung dari hutan belantara Sumatra, tanpa pemanis buatan.")
-                put(COL_PRODUK_FOTO, "https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=400")
+                put(COL_PRODUK_FOTO, "madu")
             }
         )
 

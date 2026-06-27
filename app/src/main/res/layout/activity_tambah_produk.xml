@@ -50,22 +50,18 @@
                     android:src="@drawable/ic_placeholder" />
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- URL Foto Input -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/til_foto"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            <!-- Tombol Pilih Foto -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_pilih_foto"
+                style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:hint="URL Foto Produk"
-                app:helperText="Masukkan URL gambar produk (opsional)">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/et_foto"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textUri" />
-            </com.google.android.material.textfield.TextInputLayout>
+                android:layout_marginBottom="16dp"
+                android:text="PILIH FOTO DARI GALERI"
+                android:textColor="?attr/colorPrimary"
+                app:icon="@android:drawable/ic_menu_gallery"
+                app:iconTint="?attr/colorPrimary"
+                app:cornerRadius="8dp" />
 
             <!-- Nama Produk -->
             <com.google.android.material.textfield.TextInputLayout

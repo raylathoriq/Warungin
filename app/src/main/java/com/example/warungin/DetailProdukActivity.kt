@@ -50,8 +50,8 @@ class DetailProdukActivity : AppCompatActivity() {
 
         // 1. Kirim Pesan WhatsApp (wa.me)
         binding.btnChatWa.setOnClickListener {
-            val phone = "628123456789" // Nomor WhatsApp default
-            val message = "Halo, saya tertarik untuk membeli produk *${produk.nama}* seharga *${formatRupiah(produk.harga)}*. Apakah stoknya masih tersedia?"
+            val phone = "62895332071005" 
+            val message = "Halo, saya ingin membeli produk *${produk.nama}* seharga *${formatRupiah(produk.harga)}*. Apakah stoknya masih tersedia?"
             val url = "https://wa.me/$phone?text=${Uri.encode(message)}"
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
             try {
@@ -63,8 +63,8 @@ class DetailProdukActivity : AppCompatActivity() {
 
         // 2. Tampilkan Lokasi di Google Maps (geo:)
         binding.btnGoogleMaps.setOnClickListener {
-            // Koordinat default Jakarta (-6.200000, 106.816666) sebagai sampel Toko Warungin
-            val geoUri = Uri.parse("geo:0,0?q=-6.200000,106.816666(Toko+Warungin)")
+            // Koordinat toko pengguna (-6.118309, 106.885224)
+            val geoUri = Uri.parse("geo:0,0?q=-6.118309,106.885224(Warungin)")
             val intent = Intent(Intent.ACTION_VIEW, geoUri).apply {
                 setPackage("com.google.android.apps.maps") // Khusus aplikasi Google Maps jika ada
             }
@@ -74,7 +74,7 @@ class DetailProdukActivity : AppCompatActivity() {
                 // Fallback jika Google Maps app tidak ada, buka browser
                 val browserIntent = Intent(
                     Intent.ACTION_VIEW, 
-                    Uri.parse("https://www.google.com/maps/search/?api=1&query=-6.200000,106.816666")
+                    Uri.parse("https://www.google.com/maps/search/?api=1&query=-6.118309,106.885224")
                 )
                 startActivity(browserIntent)
             }
@@ -137,12 +137,8 @@ class DetailProdukActivity : AppCompatActivity() {
             binding.tvDetailStok.setTextColor(ContextCompat.getColor(this, R.color.primary_green))
         }
 
-        // Muat Foto via Glide
-        Glide.with(this)
-            .load(produk.foto)
-            .placeholder(R.drawable.ic_placeholder)
-            .error(R.drawable.ic_placeholder)
-            .into(binding.imgDetailFoto)
+        // Muat Foto via ImageHelper
+        ImageHelper.loadImage(this, produk.foto, binding.imgDetailFoto)
     }
 
     private fun formatRupiah(amount: Double): String {

@@ -34,12 +34,8 @@ class InventoriAdapter(
                 )
             }
 
-            // Load Gambar via Glide
-            Glide.with(binding.root.context)
-                .load(produk.foto)
-                .placeholder(R.drawable.ic_placeholder)
-                .error(R.drawable.ic_placeholder)
-                .into(binding.imgThumb)
+            // Load Gambar via ImageHelper
+            ImageHelper.loadImage(binding.root.context, produk.foto, binding.imgThumb)
 
             // Listener tombol minus
             binding.btnMinus.setOnClickListener {

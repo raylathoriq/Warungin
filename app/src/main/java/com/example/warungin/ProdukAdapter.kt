@@ -39,12 +39,8 @@ class ProdukAdapter(
                 )
             }
 
-            // Load Gambar via Glide
-            Glide.with(binding.root.context)
-                .load(produk.foto)
-                .placeholder(R.drawable.ic_placeholder)
-                .error(R.drawable.ic_placeholder)
-                .into(binding.imgProduk)
+            // Load Gambar via ImageHelper
+            ImageHelper.loadImage(binding.root.context, produk.foto, binding.imgProduk)
 
             // Klik item
             binding.root.setOnClickListener {

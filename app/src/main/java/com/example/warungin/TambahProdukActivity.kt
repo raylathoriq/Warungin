@@ -1,13 +1,15 @@
 package com.example.warungin
 
+import android.net.Uri
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import com.bumptech.glide.Glide
 import com.example.warungin.databinding.ActivityTambahProdukBinding
+import java.io.File
+import java.io.FileOutputStream
 
 class TambahProdukActivity : AppCompatActivity() {
 
@@ -16,7 +18,20 @@ class TambahProdukActivity : AppCompatActivity() {
     
     private var isEditMode = false
     private var editProductId = -1
+    private var currentFotoPath: String? = null
     private val categories = arrayOf("Bahan Makanan", "Bahan Minuman")
+
+    private val pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        if (uri != null) {
+            val localPath = copyUriToInternalStorage(uri)
+            if (localPath != null) {
+                currentFotoPath = localPath
+                ImageHelper.loadImage(this, localPath, binding.imgPreview)
+            } else {
+                Toast.makeText(this, "Gagal memproses gambar", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,21 +61,17 @@ class TambahProdukActivity : AppCompatActivity() {
                 binding.etHarga.setText(produk.harga.toString())
                 binding.etStok.setText(produk.stok.toString())
                 binding.etDeskripsi.setText(produk.deskripsi)
-                binding.etFoto.setText(produk.foto)
+                currentFotoPath = produk.foto
                 
                 // Muat preview awal
-                loadPreview(produk.foto)
+                ImageHelper.loadImage(this, produk.foto, binding.imgPreview)
             }
         }
 
-        // Dinamis Preview Foto dari URL saat diketik
-        binding.etFoto.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                loadPreview(s.toString().trim())
-            }
-            override fun afterTextChanged(s: Editable?) {}
-        })
+        // Klik Tombol Pilih Foto
+        binding.btnPilihFoto.setOnClickListener {
+            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+        }
 
         // Tombol Simpan
         binding.btnSimpan.setOnClickListener {
@@ -68,15 +79,22 @@ class TambahProdukActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadPreview(url: String) {
-        if (url.isNotEmpty()) {
-            Glide.with(this)
-                .load(url)
-                .placeholder(R.drawable.ic_placeholder)
-                .error(R.drawable.ic_placeholder)
-                .into(binding.imgPreview)
-        } else {
-            binding.imgPreview.setImageResource(R.drawable.ic_placeholder)
+    private fun copyUriToInternalStorage(uri: Uri): String? {
+        return try {
+            val inputStream = contentResolver.openInputStream(uri) ?: return null
+            val fileName = "produk_${System.currentTimeMillis()}.jpg"
+            val file = File(filesDir, fileName)
+            val outputStream = FileOutputStream(file)
+            
+            inputStream.use { input ->
+                outputStream.use { output ->
+                    input.copyTo(output)
+                }
+            }
+            file.absolutePath
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
         }
     }
 
@@ -86,7 +104,7 @@ class TambahProdukActivity : AppCompatActivity() {
         val hargaStr = binding.etHarga.text.toString().trim()
         val stokStr = binding.etStok.text.toString().trim()
         val deskripsi = binding.etDeskripsi.text.toString().trim()
-        val foto = binding.etFoto.text.toString().trim()
+        val foto = currentFotoPath ?: ""
 
         var isValid = true
 
@@ -128,10 +146,7 @@ class TambahProdukActivity : AppCompatActivity() {
         }
 
         if (isValid) {
-            // Gunakan gambar default jika field foto kosong
-            val fotoUrl = foto.ifEmpty {
-                "https://images.unsplash.com/photo-1542838132-92c53300491e?w=400" // Placeholder general store
-            }
+            val fotoUrl = foto
 
             if (isEditMode) {
                 // Update ke database

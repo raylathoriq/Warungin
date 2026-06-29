@@ -32,14 +32,13 @@ class JelajahActivity : AppCompatActivity() {
     private var dataLoaded = false
     private var localProductNames = HashSet<String>()
 
-    // Data class lokal untuk menampung item dari API Supplier Sembako
     data class ApiProduk(
         val nama: String,
         val rating: Double,
-        val harga: Double, // Sudah dalam Rupiah (konversi dari USD)
+        val harga: Double,
         val gambar: String,
         val deskripsi: String,
-        val kategori: String // Makanan atau Minuman
+        val kategori: String
     )
 
     private val apiProdukList = ArrayList<ApiProduk>()
@@ -52,21 +51,19 @@ class JelajahActivity : AppCompatActivity() {
 
         dbHelper = DBHelper(this)
 
-        // Muat daftar nama produk lokal untuk pengecekan duplikasi kemitraan
+        // Cek nama produk lokal
         loadLocalProductNames()
 
-        // Setup Toolbar
         binding.toolbar.setNavigationOnClickListener {
             finish()
         }
         binding.toolbar.subtitle = "Kemitraan Supplier Sembako Grosir"
 
-        // Setup RecyclerView
         binding.rvJelajah.layoutManager = LinearLayoutManager(this)
         jelajahAdapter = JelajahAdapter(apiProdukList)
         binding.rvJelajah.adapter = jelajahAdapter
 
-        // Setup Listener Tombol Coba Lagi / Retry
+        // Retry
         binding.btnRetry.setOnClickListener {
             if (isConnected) {
                 fetchApiData()
@@ -75,7 +72,7 @@ class JelajahActivity : AppCompatActivity() {
             }
         }
 
-        // Setup BroadcastReceiver status internet
+        // Cek koneksi
         connectivityReceiver = ConnectivityReceiver { connected ->
             runOnUiThread {
                 updateConnectionState(connected)
@@ -94,7 +91,7 @@ class JelajahActivity : AppCompatActivity() {
         unregisterReceiver(connectivityReceiver)
     }
 
-    // Mengambil nama produk dari database lokal untuk mencocokkan status kemitraan
+    // Load nama produk
     private fun loadLocalProductNames() {
         localProductNames.clear()
         val products = dbHelper.getAllProduk()
@@ -138,7 +135,6 @@ class JelajahActivity : AppCompatActivity() {
         binding.rvJelajah.visibility = View.GONE
 
         val queue = Volley.newRequestQueue(this)
-        // Memanggil khusus kategori 'groceries' (sembako/kelontong) dari DummyJSON
         val url = "https://dummyjson.com/products/category/groceries?limit=15"
 
         val jsonObjectRequest = JsonObjectRequest(
@@ -157,11 +153,9 @@ class JelajahActivity : AppCompatActivity() {
                         val thumbnail = productObj.getString("thumbnail")
                         val description = productObj.optString("description", "Produk supplier grosir berkualitas.")
 
-                        // Konversi USD ke Rupiah (Kalkulasi sederhana: 1 USD = Rp 15.000)
+                        // Konversi USD ke IDR
                         val priceIdr = priceUsd * 15000.0
 
-                        // Pemetaan Kategori Dinamis ke Bahan Makanan & Bahan Minuman
-                        // Jika nama produk memiliki kata susu (milk) atau jus (juice/beverage), maka Bahan Minuman. Selain itu Bahan Makanan.
                         val category = if (title.lowercase().contains("milk") || 
                                            title.lowercase().contains("juice") || 
                                            title.lowercase().contains("beverage")) {
@@ -196,7 +190,7 @@ class JelajahActivity : AppCompatActivity() {
         binding.tvErrorMessage.text = message
     }
 
-    // ================= RECYCLERVIEW ADAPTER KEMITRAAN SUPPLIER =================
+    // Adapter Supplier
     inner class JelajahAdapter(private val list: List<ApiProduk>) :
         RecyclerView.Adapter<JelajahAdapter.JelajahViewHolder>() {
 
@@ -208,7 +202,7 @@ class JelajahActivity : AppCompatActivity() {
                 itemBinding.tvJelajahRating.text = "★ ${item.rating}"
                 itemBinding.tvJelajahHarga.text = formatRupiah(item.harga)
 
-                // Cek apakah produk sudah diimpor ke database lokal
+                // Cek status import
                 val isImported = localProductNames.contains(item.nama.lowercase().trim())
 
                 if (isImported) {
@@ -222,14 +216,13 @@ class JelajahActivity : AppCompatActivity() {
                     itemBinding.btnTambahKeToko.setTextColor(ContextCompat.getColor(this@JelajahActivity, R.color.primary_green))
                     itemBinding.btnTambahKeToko.setBackgroundColor(ContextCompat.getColor(this@JelajahActivity, R.color.green_light_bg))
                     
-                    // Aksi impor ketika tombol ditekan
                     itemBinding.btnTambahKeToko.setOnClickListener {
-                        // Insert ke SQLite lokal dengan stok awal bawaan 10
+                        // Simpan DB
                         val rowId = dbHelper.insertProduk(
                             nama = item.nama,
                             kategori = item.kategori,
                             harga = item.harga,
-                            stok = 10, // Stok awal
+                            stok = 10,
                             deskripsi = item.deskripsi,
                             foto = item.gambar
                         )
@@ -241,7 +234,6 @@ class JelajahActivity : AppCompatActivity() {
                                 Toast.LENGTH_SHORT
                             ).show()
                             
-                            // Tambahkan ke cache lokal agar tombol dinonaktifkan
                             localProductNames.add(item.nama.lowercase().trim())
                             notifyItemChanged(position)
                         } else {
@@ -250,7 +242,6 @@ class JelajahActivity : AppCompatActivity() {
                     }
                 }
 
-                // Load image Glide
                 Glide.with(itemBinding.root.context)
                     .load(item.gambar)
                     .placeholder(R.drawable.ic_placeholder)

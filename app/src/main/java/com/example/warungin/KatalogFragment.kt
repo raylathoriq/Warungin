@@ -22,7 +22,7 @@ class KatalogFragment : Fragment() {
     private lateinit var adapter: ProdukAdapter
     private var allProduk = listOf<Produk>()
     
-    private var isGridView = false // Default List View
+    private var isGridView = false
     private var currentKategori = "Semua"
     private var currentSearchQuery = ""
 
@@ -39,10 +39,9 @@ class KatalogFragment : Fragment() {
 
         dbHelper = DBHelper(requireContext())
         
-        // Setup RecyclerView
         setupRecyclerView()
 
-        // Sembunyikan fitur pengelolaan jika masuk sebagai Pengunjung
+        // Sembunyikan jika pengunjung
         val sharedPrefs = requireContext().getSharedPreferences("warungin_prefs", Context.MODE_PRIVATE)
         val isAdmin = sharedPrefs.getBoolean("is_admin", true)
         if (!isAdmin) {
@@ -50,10 +49,9 @@ class KatalogFragment : Fragment() {
             binding.btnJelajah.visibility = View.GONE
         }
 
-        // Load data awal
         loadData()
 
-        // Listener Search Bar
+        // Search
         binding.etSearch.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
@@ -63,7 +61,7 @@ class KatalogFragment : Fragment() {
             override fun afterTextChanged(s: Editable?) {}
         })
 
-        // Listener Kategori Chips
+        // Kategori chip
         binding.chipGroupKategori.setOnCheckedStateChangeListener { group, checkedIds ->
             val checkedId = checkedIds.firstOrNull()
             currentKategori = when (checkedId) {
@@ -74,19 +72,19 @@ class KatalogFragment : Fragment() {
             filterData()
         }
 
-        // Toggle Grid/List
+        // Toggle layout
         binding.btnToggleLayout.setOnClickListener {
             isGridView = !isGridView
             updateLayoutManager()
         }
 
-        // Tombol Jelajah Web Service API
+        // Jelajah API
         binding.btnJelajah.setOnClickListener {
             val intent = Intent(requireContext(), JelajahActivity::class.java)
             startActivity(intent)
         }
 
-        // FAB Tambah Produk
+        // Tambah
         binding.fabTambahProduk.setOnClickListener {
             val intent = Intent(requireContext(), TambahProdukActivity::class.java)
             startActivity(intent)
@@ -95,13 +93,11 @@ class KatalogFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        // Muat ulang data saat kembali ke fragment ini (agar update terbaru langsung muncul)
         loadData()
     }
 
     private fun setupRecyclerView() {
         adapter = ProdukAdapter(ArrayList()) { produk ->
-            // Ketika produk ditekan, buka DetailProdukActivity
             val intent = Intent(requireContext(), DetailProdukActivity::class.java).apply {
                 putExtra("PRODUK_DATA", produk)
             }
@@ -114,10 +110,10 @@ class KatalogFragment : Fragment() {
     private fun updateLayoutManager() {
         if (isGridView) {
             binding.rvProduk.layoutManager = GridLayoutManager(requireContext(), 2)
-            binding.btnToggleLayout.setImageResource(android.R.drawable.ic_menu_sort_by_size) // Ikon list
+            binding.btnToggleLayout.setImageResource(android.R.drawable.ic_menu_sort_by_size)
         } else {
             binding.rvProduk.layoutManager = LinearLayoutManager(requireContext())
-            binding.btnToggleLayout.setImageResource(android.R.drawable.ic_dialog_dialer) // Ikon grid
+            binding.btnToggleLayout.setImageResource(android.R.drawable.ic_dialog_dialer)
         }
     }
 
@@ -129,21 +125,21 @@ class KatalogFragment : Fragment() {
     private fun filterData() {
         var filteredList = allProduk
 
-        // Filter berdasarkan kategori chip
+        // Filter kategori
         if (currentKategori != "Semua") {
             filteredList = filteredList.filter {
                 it.kategori.equals(currentKategori, ignoreCase = true)
             }
         }
 
-        // Filter berdasarkan pencarian nama
+        // Filter nama
         if (currentSearchQuery.isNotEmpty()) {
             filteredList = filteredList.filter {
                 it.nama.contains(currentSearchQuery, ignoreCase = true)
             }
         }
 
-        // Update adapter & empty state
+        // Empty state check
         adapter.updateData(filteredList)
         if (filteredList.isEmpty()) {
             binding.layoutEmptyState.visibility = View.VISIBLE
@@ -159,3 +155,4 @@ class KatalogFragment : Fragment() {
         _binding = null
     }
 }
+

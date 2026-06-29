@@ -16,22 +16,22 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Cek status role dari SharedPreferences
+        // Cek role
         val sharedPrefs = getSharedPreferences("warungin_prefs", Context.MODE_PRIVATE)
         val isAdmin = sharedPrefs.getBoolean("is_admin", true)
 
         if (!isAdmin) {
-            // Sembunyikan tab manajemen jika masuk sebagai Pengunjung/Pembeli
+            // Sembunyikan menu non-admin
             binding.bottomNavigation.menu.findItem(R.id.navigation_inventori).isVisible = false
             binding.bottomNavigation.menu.findItem(R.id.navigation_penjualan).isVisible = false
         }
 
-        // Tampilkan fragment Katalog saat pertama kali masuk
+        // Default fragment
         if (savedInstanceState == null) {
             loadFragment(KatalogFragment())
         }
 
-        // Event listener saat item navigasi ditekan
+        // Navigasi
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             val fragment: Fragment = when (item.itemId) {
                 R.id.navigation_katalog -> KatalogFragment()
@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Helper untuk mengganti fragment di container
+    // Load fragment
     private fun loadFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, fragment)

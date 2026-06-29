@@ -29,15 +29,14 @@ class TambahPenjualanActivity : AppCompatActivity() {
 
         dbHelper = DBHelper(this)
 
-        // Setup Toolbar Back Button
         binding.toolbar.setNavigationOnClickListener {
             finish()
         }
 
-        // Muat produk untuk dropdown
+        // Load produk
         loadProdukDropdown()
 
-        // TextWatcher untuk update harga total secara real-time
+        // Update total harga
         binding.etJumlah.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
@@ -46,14 +45,14 @@ class TambahPenjualanActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {}
         })
 
-        // Tombol Simpan Transaksi
+        // Simpan
         binding.btnSimpanPenjualan.setOnClickListener {
             saveTransaction()
         }
     }
 
     private fun loadProdukDropdown() {
-        listProduk = dbHelper.getAllProduk().filter { it.stok > 0 } // Hanya tampilkan produk dengan stok > 0
+        listProduk = dbHelper.getAllProduk().filter { it.stok > 0 }
         val displayNames = listProduk.map { "${it.nama} (Stok: ${it.stok})" }
 
         val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, displayNames)
@@ -92,7 +91,7 @@ class TambahPenjualanActivity : AppCompatActivity() {
             return
         }
 
-        // Cek apakah jumlah melebihi stok
+        // Cek stok
         if (jumlah > produk.stok) {
             binding.tilJumlah.error = "Jumlah melebihi stok tersedia (${produk.stok})!"
             binding.tvTotalHarga.text = "Rp 0"
@@ -129,22 +128,22 @@ class TambahPenjualanActivity : AppCompatActivity() {
         }
 
         if (isValid && produk != null && jumlah != null) {
-            // Tanggal transaksi saat ini
+            // Tanggal
             val dateFormat = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale("in", "ID"))
             val tanggalStr = dateFormat.format(Date())
 
-            // Simpan ke database
+            // Simpan DB
             val resultId = dbHelper.insertPenjualan(
                 produk.id, produk.nama, jumlah, totalHarga, tanggalStr
             )
 
             if (resultId > 0) {
-                // Potong stok produk
+                // Potong stok
                 val newStok = produk.stok - jumlah
                 dbHelper.updateStok(produk.id, newStok)
 
                 Toast.makeText(this, "Penjualan '${produk.nama}' berhasil dicatat!", Toast.LENGTH_LONG).show()
-                finish() // Selesai & kembali ke list riwayat
+                finish()
             } else {
                 Toast.makeText(this, "Gagal mencatat transaksi penjualan", Toast.LENGTH_SHORT).show()
             }
@@ -157,3 +156,4 @@ class TambahPenjualanActivity : AppCompatActivity() {
         return format.format(amount).replace(",00", "")
     }
 }
+

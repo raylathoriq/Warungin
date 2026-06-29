@@ -14,7 +14,7 @@ class SplashActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySplashBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Terapkan preferensi mode malam sebelum menggambar layout
+        // Cek dark mode
         val sharedPrefs = getSharedPreferences("warungin_prefs", Context.MODE_PRIVATE)
         val isDarkMode = sharedPrefs.getBoolean("is_dark_mode", false)
         if (isDarkMode) {
@@ -25,15 +25,15 @@ class SplashActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
         
-        // Menggunakan ViewBinding untuk layout Splash Screen
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Delay 2 detik (2000ms) lalu berpindah ke LoginActivity
+        // Delay 2 detik ke LoginActivity
         Handler(Looper.getMainLooper()).postDelayed({
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
-            finish() // Menutup SplashActivity agar tidak bisa di-back kembali
+            finish()
         }, 2000)
     }
 }
+

@@ -19,14 +19,14 @@ class LoginActivity : AppCompatActivity() {
 
         dbHelper = DBHelper(this)
 
-        // Tombol Masuk
+        // Login Admin
         binding.btnLogin.setOnClickListener {
             val username = binding.etUsername.text.toString().trim()
             val password = binding.etPassword.text.toString().trim()
 
             var isValid = true
 
-            // Validasi Input Username
+            // Validasi
             if (username.isEmpty()) {
                 binding.tilUsername.error = "Nama pengguna tidak boleh kosong"
                 isValid = false
@@ -34,7 +34,6 @@ class LoginActivity : AppCompatActivity() {
                 binding.tilUsername.error = null
             }
 
-            // Validasi Input Password
             if (password.isEmpty()) {
                 binding.tilPassword.error = "Kata sandi tidak boleh kosong"
                 isValid = false
@@ -43,26 +42,26 @@ class LoginActivity : AppCompatActivity() {
             }
 
             if (isValid) {
-                // Cek kredensial ke Database SQLite
+                // Cek ke DB
                 val loginSuccess = dbHelper.cekLogin(username, password)
                 if (loginSuccess) {
-                    // Simpan status admin
+                    // Simpan role
                     val sharedPrefs = getSharedPreferences("warungin_prefs", Context.MODE_PRIVATE)
                     sharedPrefs.edit().putBoolean("is_admin", true).apply()
 
                     Toast.makeText(this, "Selamat datang kembali, $username!", Toast.LENGTH_SHORT).show()
                     val intent = Intent(this, MainActivity::class.java)
                     startActivity(intent)
-                    finish() // Tutup login screen agar tidak bisa di-back
+                    finish()
                 } else {
                     Toast.makeText(this, "Username atau Password salah!", Toast.LENGTH_SHORT).show()
                 }
             }
         }
 
-        // Tombol Pengunjung
+        // Login Guest
         binding.btnGuest.setOnClickListener {
-            // Simpan status pengunjung (bukan admin)
+            // Simpan role
             val sharedPrefs = getSharedPreferences("warungin_prefs", Context.MODE_PRIVATE)
             sharedPrefs.edit().putBoolean("is_admin", false).apply()
 
@@ -73,3 +72,4 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 }
+

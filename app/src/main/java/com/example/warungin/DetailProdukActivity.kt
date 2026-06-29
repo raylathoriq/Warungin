@@ -27,18 +27,15 @@ class DetailProdukActivity : AppCompatActivity() {
 
         dbHelper = DBHelper(this)
 
-        // Setup Toolbar Back Button
         binding.toolbar.setNavigationOnClickListener {
             finish()
         }
 
-        // Ambil data produk dari Intent
         produk = intent.getSerializableExtra("PRODUK_DATA") as? Produk ?: return finish()
 
-        // Tampilkan data ke UI
         displayData()
 
-        // Filter CRUD buttons based on role
+        // Sembunyikan tombol jika bukan admin
         val sharedPrefs = getSharedPreferences("warungin_prefs", Context.MODE_PRIVATE)
         val isAdmin = sharedPrefs.getBoolean("is_admin", true)
         if (!isAdmin) {
@@ -46,9 +43,7 @@ class DetailProdukActivity : AppCompatActivity() {
             binding.btnDeleteProduk.visibility = View.GONE
         }
 
-        // ================= IMPLICIT INTENT =================
-
-        // 1. Kirim Pesan WhatsApp (wa.me)
+        // WhatsApp
         binding.btnChatWa.setOnClickListener {
             val phone = "62895332071005" 
             val message = "Halo, saya ingin membeli produk *${produk.nama}* seharga *${formatRupiah(produk.harga)}*. Apakah stoknya masih tersedia?"
@@ -61,17 +56,15 @@ class DetailProdukActivity : AppCompatActivity() {
             }
         }
 
-        // 2. Tampilkan Lokasi di Google Maps (geo:)
+        // Google Maps
         binding.btnGoogleMaps.setOnClickListener {
-            // Koordinat toko pengguna (-6.118309, 106.885224)
             val geoUri = Uri.parse("geo:0,0?q=-6.118309,106.885224(Warungin)")
             val intent = Intent(Intent.ACTION_VIEW, geoUri).apply {
-                setPackage("com.google.android.apps.maps") // Khusus aplikasi Google Maps jika ada
+                setPackage("com.google.android.apps.maps")
             }
             try {
                 startActivity(intent)
             } catch (e: Exception) {
-                // Fallback jika Google Maps app tidak ada, buka browser
                 val browserIntent = Intent(
                     Intent.ACTION_VIEW, 
                     Uri.parse("https://www.google.com/maps/search/?api=1&query=-6.118309,106.885224")
@@ -80,28 +73,25 @@ class DetailProdukActivity : AppCompatActivity() {
             }
         }
 
-        // 3. Cari Produk di Browser
+        // Cari Info Produk
         binding.imgDetailFoto.setOnClickListener {
-            // Implicit intent untuk mencari gambar / info produk di Google Search browser
             val queryUrl = "https://www.google.com/search?q=${Uri.encode(produk.nama)}"
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(queryUrl))
             startActivity(intent)
-            Toast.makeText(this, "Membuka pencarian browser untuk ${produk.nama}...", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Membuka pencarian browser...", Toast.LENGTH_SHORT).show()
         }
 
-        // ================= CRUD / ACTION BUTTONS =================
-
-        // 4. Ubah Produk (Explicit Intent)
+        // Edit Produk
         binding.btnEditProduk.setOnClickListener {
             val intent = Intent(this, TambahProdukActivity::class.java).apply {
                 putExtra("EDIT_MODE", true)
                 putExtra("PRODUK_DATA", produk)
             }
             startActivity(intent)
-            finish() // Tutup layar detail agar kembali ke KatalogFragment yang terupdate
+            finish()
         }
 
-        // 5. Hapus Produk (SQLite Delete)
+        // Hapus Produk
         binding.btnDeleteProduk.setOnClickListener {
             AlertDialog.Builder(this)
                 .setTitle("Hapus Produk")
@@ -126,7 +116,7 @@ class DetailProdukActivity : AppCompatActivity() {
         binding.tvDetailHarga.text = formatRupiah(produk.harga)
         binding.tvDetailDeskripsi.text = produk.deskripsi
 
-        // Set Badge Stok
+        // Cek stok
         if (produk.stok < 5) {
             binding.tvDetailStok.text = "Stok menipis: ${produk.stok}"
             binding.tvDetailStok.setBackgroundResource(R.drawable.badge_stok_menipis)
@@ -137,7 +127,6 @@ class DetailProdukActivity : AppCompatActivity() {
             binding.tvDetailStok.setTextColor(ContextCompat.getColor(this, R.color.primary_green))
         }
 
-        // Muat Foto via ImageHelper
         ImageHelper.loadImage(this, produk.foto, binding.imgDetailFoto)
     }
 
@@ -147,3 +136,4 @@ class DetailProdukActivity : AppCompatActivity() {
         return format.format(amount).replace(",00", "")
     }
 }
+

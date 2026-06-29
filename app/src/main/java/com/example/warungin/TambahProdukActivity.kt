@@ -40,16 +40,15 @@ class TambahProdukActivity : AppCompatActivity() {
 
         dbHelper = DBHelper(this)
 
-        // Setup Toolbar Back Button
         binding.toolbar.setNavigationOnClickListener {
             finish()
         }
 
-        // Setup Dropdown Kategori
+        // Kategori dropdown
         val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, categories)
         binding.actKategori.setAdapter(adapter)
 
-        // Cek apakah mode Edit
+        // Cek mode edit
         isEditMode = intent.getBooleanExtra("EDIT_MODE", false)
         if (isEditMode) {
             binding.toolbar.title = "Ubah Produk"
@@ -62,23 +61,22 @@ class TambahProdukActivity : AppCompatActivity() {
                 binding.etStok.setText(produk.stok.toString())
                 binding.etDeskripsi.setText(produk.deskripsi)
                 currentFotoPath = produk.foto
-                
-                // Muat preview awal
                 ImageHelper.loadImage(this, produk.foto, binding.imgPreview)
             }
         }
 
-        // Klik Tombol Pilih Foto
+        // Pilih foto
         binding.btnPilihFoto.setOnClickListener {
             pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
 
-        // Tombol Simpan
+        // Simpan data
         binding.btnSimpan.setOnClickListener {
             saveProduct()
         }
     }
 
+    // Salin foto ke storage internal
     private fun copyUriToInternalStorage(uri: Uri): String? {
         return try {
             val inputStream = contentResolver.openInputStream(uri) ?: return null
@@ -149,7 +147,6 @@ class TambahProdukActivity : AppCompatActivity() {
             val fotoUrl = foto
 
             if (isEditMode) {
-                // Update ke database
                 val rowsAffected = dbHelper.updateProduk(
                     editProductId, nama, kategori, harga!!, stok!!, deskripsi, fotoUrl
                 )
@@ -160,7 +157,6 @@ class TambahProdukActivity : AppCompatActivity() {
                     Toast.makeText(this, "Gagal memperbarui produk", Toast.LENGTH_SHORT).show()
                 }
             } else {
-                // Insert ke database
                 val newId = dbHelper.insertProduk(
                     nama, kategori, harga!!, stok!!, deskripsi, fotoUrl
                 )
@@ -174,3 +170,4 @@ class TambahProdukActivity : AppCompatActivity() {
         }
     }
 }
+
